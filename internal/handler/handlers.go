@@ -10,16 +10,28 @@ import (
 	"github.com/osamikoyo/test-task/pkg/loger"
 )
 
+// SongHandler структура для обработчиков песен.
 type SongHandler struct {
-    service *service.SongService
-	logger loger.Logger
+	service *service.SongService
+	logger  loger.Logger
 }
 
+// NewSongHandler создает новый экземпляр SongHandler.
 func NewSongHandler(service *service.SongService, logger loger.Logger) *SongHandler {
-    return &SongHandler{service: service, logger: logger}
+	return &SongHandler{service: service, logger: logger}
 }
 
-
+// CreateSong создает новую песню.
+// @Summary Создать новую песню
+// @Description Добавляет новую песню в библиотеку
+// @Tags songs
+// @Accept json
+// @Produce json
+// @Param song body models.Song true "Данные песни"
+// @Success 201 {object} models.Song
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /songs [post]
 func (h *SongHandler) CreateSong(c *gin.Context) {
 	h.logger.Info().Msg("Handling create song request")
 	var song models.Song
@@ -37,6 +49,15 @@ func (h *SongHandler) CreateSong(c *gin.Context) {
 	c.JSON(http.StatusCreated, song)
 }
 
+// GetSong возвращает песню по ID.
+// @Summary Получить песню по ID
+// @Description Возвращает информацию о песне по её ID
+// @Tags songs
+// @Produce json
+// @Param id path int true "ID песни"
+// @Success 200 {object} models.Song
+// @Failure 404 {object} map[string]string
+// @Router /songs/{id} [get]
 func (h *SongHandler) GetSong(c *gin.Context) {
 	id, _ := strconv.Atoi(c.Param("id"))
 	h.logger.Info().Uint("id", uint(id)).Msg("Handling get song request")
@@ -50,6 +71,18 @@ func (h *SongHandler) GetSong(c *gin.Context) {
 	c.JSON(http.StatusOK, song)
 }
 
+// UpdateSong обновляет данные песни.
+// @Summary Обновить песню
+// @Description Обновляет информацию о песне по её ID
+// @Tags songs
+// @Accept json
+// @Produce json
+// @Param id path int true "ID песни"
+// @Param song body models.Song true "Обновленные данные песни"
+// @Success 200 {object} models.Song
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /songs/{id} [put]
 func (h *SongHandler) UpdateSong(c *gin.Context) {
 	id, _ := strconv.Atoi(c.Param("id"))
 	h.logger.Info().Uint("id", uint(id)).Msg("Handling update song request")
@@ -69,6 +102,14 @@ func (h *SongHandler) UpdateSong(c *gin.Context) {
 	c.JSON(http.StatusOK, song)
 }
 
+// DeleteSong удаляет песню по ID.
+// @Summary Удалить песню
+// @Description Удаляет песню по её ID
+// @Tags songs
+// @Param id path int true "ID песни"
+// @Success 204
+// @Failure 500 {object} map[string]string
+// @Router /songs/{id} [delete]
 func (h *SongHandler) DeleteSong(c *gin.Context) {
 	id, _ := strconv.Atoi(c.Param("id"))
 	h.logger.Info().Uint("id", uint(id)).Msg("Handling delete song request")
@@ -81,6 +122,18 @@ func (h *SongHandler) DeleteSong(c *gin.Context) {
 	c.JSON(http.StatusNoContent, nil)
 }
 
+// GetAllSongs возвращает список песен с фильтрацией и пагинацией.
+// @Summary Получить все песни
+// @Description Возвращает список песен с возможностью фильтрации и пагинации
+// @Tags songs
+// @Produce json
+// @Param group query string false "Группа"
+// @Param song query string false "Название песни"
+// @Param offset query int false "Смещение" default(0)
+// @Param limit query int false "Лимит" default(10)
+// @Success 200 {array} models.Song
+// @Failure 500 {object} map[string]string
+// @Router /songs [get]
 func (h *SongHandler) GetAllSongs(c *gin.Context) {
 	h.logger.Info().Msg("Handling get all songs request")
 	filter := make(map[string]string)
